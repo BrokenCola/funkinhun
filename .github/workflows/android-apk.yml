@@ -1,17 +1,19 @@
+
 name: Build Funkin Hub APK
 
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 permissions:
   contents: read
-  actions: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -22,10 +24,14 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-       - name: Set up Android SDK
-        run: |
-          yes | sdkmanager --licenses
-          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses
+
+      - name: Install Android SDK packages
+        run: sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Unpack project source
         run: unzip -q FunkinHub-Mobile-Android-Source-v0.3.0.zip -d source
@@ -41,4 +47,3 @@ jobs:
           path: source/FunkinHubAndroid/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
-          
